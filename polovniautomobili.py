@@ -14,7 +14,7 @@ def driver():
     ch_driver = webdriver.Chrome(service=Service('C:/Windows/chromedriver.exe'))
     ch_driver.maximize_window()
     ch_driver.get('https://polovniautomobili.com/')
-    wait=WebDriverWait(ch_driver, 30)
+    wait=WebDriverWait(ch_driver, 50)
 
     yield ch_driver
     ch_driver.quit()
@@ -34,7 +34,7 @@ def test_register_successful_on_polovni_automobili(driver):
 
     wait.until(EC.visibility_of_element_located((By.ID,"email")))
 
-    driver.find_element(By.ID,"email").send_keys("bojanstupar1989+test5@gmail.com")
+    driver.find_element(By.ID,"email").send_keys("bojanstupar1989+test15@gmail.com")
     driver.find_element(By.ID,"password_first").send_keys("Celarevo44!")
     driver.find_element(By.ID,"password_second").send_keys("Celarevo44!")
 
@@ -148,10 +148,10 @@ def test_register_email_already_exists(driver):
         EC.visibility_of_element_located((By.ID, "register_email_error"))
     )
 
-
     error_text = error_element.text.strip()
 
     assert "Uneta E-mail adresa je već zauzeta" in error_text
+
 
 def test_register_tos_required(driver):
     wait = WebDriverWait(driver, 30)
