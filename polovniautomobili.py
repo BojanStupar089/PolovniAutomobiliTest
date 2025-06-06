@@ -307,10 +307,149 @@ def test_login_click_forgot_password_link(driver):
     # Click the button
     send_button.click()
 
+def test_polovni_automobili_youtube_link(driver):
+    wait = WebDriverWait(driver, 30)
+    youtube_link = wait.until(EC.element_to_be_clickable(
+        (By.XPATH, '//a[contains(@href, "youtube.com/user/polovniautomobili")]')
+    ))
 
 
+    youtube_link.click()
+
+def test_polovni_automobili_brza_pretraga_and_click_najnoviji_oglasi(driver):
+    wait = WebDriverWait(driver, 10)
+    actions = ActionChains(driver)
 
 
+    brza_pretraga = wait.until(EC.presence_of_element_located((By.XPATH, "//a[contains(text(), 'BRZA PRETRAGA')]")))
+    actions.move_to_element(brza_pretraga).perform()
+
+
+    najnoviji_oglasi = wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "Najnoviji oglasi")))
+    najnoviji_oglasi.click()
+
+    najnoviji_oglasi=wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR,"h1.searchTitle")))
+
+    assert "Najnoviji oglasi automobila" in najnoviji_oglasi.text,"Error"
+
+def test_polovni_automobili_brza_pretraga_and_click_online_prodavnica(driver):
+    wait = WebDriverWait(driver, 10)
+    actions = ActionChains(driver)
+
+    brza_pretraga = wait.until(EC.presence_of_element_located((By.XPATH, "//a[contains(text(), 'BRZA PRETRAGA')]")))
+    actions.move_to_element(brza_pretraga).perform()
+
+    online_prodavnica = wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "Online prodavnica")))
+    online_prodavnica.click()
+
+    online_shop = wait.until(EC.visibility_of_element_located((By.TAG_NAME,"h2")))
+
+    assert "Majica" in online_shop.text,"Error"
+
+
+def test_polovni_automobili_ponuda_vozila_and_click_transportna_vozila(driver):
+    wait = WebDriverWait(driver, 10)
+    actions = ActionChains(driver)
+
+    ponuda_vozila = wait.until(EC.presence_of_element_located((By.XPATH, "//a[contains(text(), 'PONUDA VOZILA')]")))
+    actions.move_to_element(ponuda_vozila).perform()
+
+    transportna_vozila=wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "Transportna vozila")))
+    transportna_vozila.click()
+
+    transportna_vozila_title=wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR,"h1.home-title.uk-text-center-small")))
+
+    assert "Kombi i laka dostavna vozila" in transportna_vozila_title.text,"Error"
+
+def test_polovni_automobili_delovi_and_oprema_click_elektrika_and_elektronika(driver):
+    wait = WebDriverWait(driver, 10)
+    actions = ActionChains(driver)
+
+    delovi_i_oprema = wait.until(EC.presence_of_element_located((By.XPATH, "//a[contains(text(), 'DELOVI I OPREMA')]")))
+    actions.move_to_element(delovi_i_oprema).perform()
+
+    elektrika_i_elektronika = wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "Elektrika i elektronika")))
+    elektrika_i_elektronika.click()
+
+    elektrika_i_elektronika_title=wait.until(EC.visibility_of_element_located((By.CLASS_NAME,"searchTitle")))
+
+    assert "Elektrika i elektronika - auto delovi" in elektrika_i_elektronika_title.text,"Error"
+
+
+def test_polovni_automobili_delovi_and_oprema_click_delovi_and_oprema_search_motorcycle_case(driver):
+    wait = WebDriverWait(driver, 10)
+    actions = ActionChains(driver)
+
+    delovi_i_oprema = wait.until(EC.presence_of_element_located((By.XPATH, "//a[contains(text(), 'DELOVI I OPREMA')]")))
+    actions.move_to_element(delovi_i_oprema).perform()
+
+    delovi_i_oprema_za_motore = wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "Delovi i oprema za motore")))
+    delovi_i_oprema_za_motore.click()
+
+    wait.until(EC.visibility_of_element_located((By.ID,"text_search")))
+    driver.find_element(By.ID,"text_search").send_keys("kofer")
+    driver.find_element(By.ID,"partsCondition_0").click()
+    driver.find_element(By.ID,"submit").click()
+
+    delovi_i_oprema_za_motore_title=wait.until(EC.visibility_of_element_located((By.CLASS_NAME,"searchTitle")))
+
+    assert "Pretraga opreme za motore" in delovi_i_oprema_za_motore_title.text,"Error"
+
+
+def test_polovni_automobili_usluge_and_krediti(driver):
+    wait = WebDriverWait(driver, 20)
+    actions = ActionChains(driver)
+
+    usluge_i_krediti = wait.until(EC.presence_of_element_located((By.XPATH, "//a[contains(text(), 'USLUGE I KREDITI')]")))
+    actions.move_to_element(usluge_i_krediti).perform()
+    usluge_i_krediti.click()
+
+    ponuda_btn = wait.until(EC.element_to_be_clickable(
+        (By.CSS_SELECTOR, "a.buttonOrder.paOrangeButtonPrimary[href='/paketi-kredita']")
+     ))
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", ponuda_btn)
+    ponuda_btn.click()
+
+    krediti_text=driver.find_element(By.TAG_NAME,"h1").text
+
+    assert "Krediti - najefikasnije sredstvo plaćanja" in krediti_text,"Error"
+
+def test_polovni_automobili_o_nama(driver):
+    wait = WebDriverWait(driver, 10)
+
+    # Skroluj skroz do dna stranice
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(2)  # sačekaj da se footer elementi učitaju
+
+    # Sačekaj i pronađi link "O nama"
+    o_nama_link = wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "O nama")))
+
+    # Klikni na link
+    o_nama_link.click()
+
+    o_nama_text=driver.find_element(By.TAG_NAME,"h1").text
+    assert "O sajtu Polovniautomobili.com" in o_nama_text,"Error"
+
+
+def test_polovni_automobili_click_apex_automobili_bussiness_link(driver):
+    wait = WebDriverWait(driver, 40)
+
+    biznis_link = wait.until(EC.presence_of_element_located(
+        (By.CSS_SELECTOR, 'a[href="/lista-biznis-prodavaca"]')
+    ))
+
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", biznis_link)
+    biznis_link.click()
+
+    apex_link = wait.until(EC.element_to_be_clickable(
+        (By.CSS_SELECTOR, 'a.dealerLogoHolder[href^="/apex-automobili"]')
+    ))
+
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", apex_link)
+    apex_link.click()
+
+    apex_title=driver.find_element(By.TAG_NAME,"h1").text
+    assert "APEX automobili" in apex_title,"Error"
 
 
 
