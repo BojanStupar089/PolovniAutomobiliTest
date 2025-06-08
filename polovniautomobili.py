@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
@@ -316,6 +317,62 @@ def test_polovni_automobili_youtube_link(driver):
 
     youtube_link.click()
 
+def test_polovni_automobili_settings_my_profile(driver):
+    wait = WebDriverWait(driver, 30)
+    login(driver)
+
+    moj_profil = wait.until(EC.presence_of_element_located(
+        (By.CSS_SELECTOR, "a.js_ga-event.signin_menu_element[data-label='klik na moj profil']")
+    ))
+
+    # Napravi akciju hover (mouse over)
+    actions = ActionChains(driver)
+    actions.move_to_element(moj_profil).perform()
+
+    podesavanja = wait.until(EC.element_to_be_clickable(
+        (By.XPATH, "//a[contains(@href, '/redirect/podesavanja') and contains(text(), 'Podešavanja')]")
+    ))
+    podesavanja.click()
+
+    wait.until(EC.visibility_of_element_located((By.ID,"first_name")))
+
+    driver.find_element(By.ID,"first_name").send_keys("Bojan")
+    driver.find_element(By.ID,"last_name").send_keys("Stupar")
+    time.sleep(2)
+    driver.find_element(By.ID,"address").send_keys("Augusta Cesarca 11")
+    driver.find_element(By.ID,"city").send_keys("Novi Sad")
+    driver.find_element(By.ID,"zip_code").send_keys("21000")
+    time.sleep(3)
+
+    dropdown_toggle = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".sumo_region .CaptionCont")))
+    driver.execute_script("arguments[0].click();", dropdown_toggle)
+    time.sleep(2)  # Pusti da se prikaže lista
+
+    # 2. Klikni na "Južno-bački"
+    juzno_backi_option = wait.until(EC.element_to_be_clickable(
+        (By.XPATH, "//div[contains(@class,'sumo_region')]//li[.//label[normalize-space()='Južno-bački']]")))
+    driver.execute_script("arguments[0].click();", juzno_backi_option)
+    time.sleep(2)  # Pusti da se selektuje
+
+    # 3. Klikni van menija da potvrdiš izbor (npr. na body)
+    driver.find_element(By.TAG_NAME, "body").click()
+
+    time.sleep(2)
+    driver.find_element(By.ID,"cellphone").send_keys("065123321")
+
+    time.sleep(2)
+    driver.find_element(By.ID,"submit").click()
+
+def test_polovni_automobili_click_button_post_ad(driver):
+    wait = WebDriverWait(driver, 30)
+    login(driver)
+
+    postavi_oglas = driver.find_element(By.CSS_SELECTOR, "a.top-menu-submit-classified")
+    driver.execute_script("arguments[0].click();", postavi_oglas)
+
+    postavi_oglas=wait.until(EC.visibility_of_element_located((By.TAG_NAME,"h1"))).text
+    assert "Formular za postavku oglasa" in postavi_oglas, "Error"
+
 def test_polovni_automobili_brza_pretraga_and_click_najnoviji_oglasi(driver):
     wait = WebDriverWait(driver, 10)
     actions = ActionChains(driver)
@@ -450,6 +507,381 @@ def test_polovni_automobili_click_apex_automobili_bussiness_link(driver):
 
     apex_title=driver.find_element(By.TAG_NAME,"h1").text
     assert "APEX automobili" in apex_title,"Error"
+
+def test_polovni_automobili_click_autotest(driver):
+
+    wait = WebDriverWait(driver, 20)
+    auto_testovi_link = wait.until(EC.element_to_be_clickable(
+        (By.CSS_SELECTOR, 'a[href="/video-sadrzaj"]')
+    ))
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", auto_testovi_link)
+    auto_testovi_link.click()
+
+    auto_testovi_title=driver.find_element(By.TAG_NAME,"h1").text
+
+    assert "Auto-testovi najinteresantnijih modela | Polovniautomobili.com" in auto_testovi_title,"Error"
+
+def test_polovni_automobili_click_car_buying_guide(driver):
+
+    wait = WebDriverWait(driver, 20)
+    vodic_link = wait.until(EC.element_to_be_clickable(
+        (By.CSS_SELECTOR, 'a.paBlueButtonTertiary[href="/pomoc-pri-kupovini-automobila"]')
+    ))
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", vodic_link)
+    vodic_link.click()
+
+    vodic_title=driver.find_element(By.TAG_NAME,"h1").text
+    assert "Vodič za kupovinu automobila" in vodic_title,"Error"
+
+def test_polovni_automobili_search_arteon(driver):
+
+    wait = WebDriverWait(driver, 50)
+
+
+    dropdown_trigger = wait.until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, "div.SumoSelect[name='brand'], div.SumoSelect"))
+    )
+    dropdown_trigger.click()
+    time.sleep(2)
+
+    search_input = driver.find_element(By.CSS_SELECTOR, ".SumoSelect.open input")
+    search_input.send_keys("Volkswagen")
+    time.sleep(2)
+
+    volkswagen_option = wait.until(EC.element_to_be_clickable((By.XPATH, "//label[contains(text(), 'Volkswagen')]")))
+    volkswagen_option.click()
+    time.sleep(3)
+
+    # II MODEL
+
+    driver.find_element(By.CSS_SELECTOR, ".sumo_model").click()
+    time.sleep(2)
+
+
+    search_input = driver.find_element(By.CSS_SELECTOR, ".sumo_model .search-txt")
+    search_input.send_keys("Arteon")
+    time.sleep(2)
+
+
+    driver.find_element(By.XPATH,
+                        "//div[contains(@class, 'sumo_model')]//ul[@class='options']//label[contains(text(), 'Arteon')]").click()
+    time.sleep(2)
+
+
+    ok_button = driver.find_element(By.CSS_SELECTOR, ".sumo_model .btnOk")
+    driver.execute_script("arguments[0].click();", ok_button)
+
+    #III Cena do
+    driver.find_element(By.ID, "price_to").send_keys("30000")
+    time.sleep(2)
+
+    # IV YEAR FROM
+    year_value_from = "2017"
+    year_label_from = f"{year_value_from} god."
+
+
+    year_dropdown = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".sumo_year_from .SelectBox")))
+    year_dropdown.click()
+    time.sleep(3)
+
+
+    option_label_from = wait.until(EC.presence_of_element_located(
+        (By.XPATH,
+         f"//div[contains(@class,'sumo_year_from')]//ul[@class='options']//label[normalize-space(text())='{year_label_from}']")
+    ))
+
+
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", option_label_from)
+    option_label_from.click()
+    time.sleep(2)
+
+
+    caption_label_from = wait.until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, ".sumo_year_from > p.CaptionCont.SelectBox")))
+    wait.until(lambda d: year_value_from in caption_label_from.text)
+
+    # V YEAR TO
+
+    year_value_to = "2024"
+    year_label_to = f"{year_value_to} god."
+
+    year_dropdown_to = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".sumo_year_to .SelectBox")))
+    year_dropdown_to.click()
+    time.sleep(3)
+
+    option_label_to = wait.until(EC.presence_of_element_located(
+        (By.XPATH,
+         f"//div[contains(@class,'sumo_year_to')]//ul[@class='options']//label[normalize-space(text())='{year_label_to}']")
+    ))
+
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", option_label_to)
+    option_label_to.click()
+    time.sleep(2)
+
+    caption_label_to = wait.until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, ".sumo_year_to > p.CaptionCont.SelectBox")))
+    wait.until(lambda d: year_value_to in caption_label_to.text)
+    time.sleep(2)
+
+    # VI KAROSERIJA
+    chassis_dropdown = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".sumo_chassis .SelectBox")))
+    chassis_dropdown.click()
+    time.sleep(3)
+
+
+    option_name = "Limuzina"
+
+    option_label = wait.until(EC.presence_of_element_located(
+        (By.XPATH,
+         f"//div[contains(@class,'sumo_chassis')]//ul[@class='options']//label[normalize-space(text())='{option_name}']")
+    ))
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", option_label)
+    time.sleep(2)
+
+    checkbox_span = option_label.find_element(By.XPATH, "./preceding-sibling::span")
+    driver.execute_script("arguments[0].click();", checkbox_span)
+    time.sleep(2)
+
+    caption_label = wait.until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, ".sumo_chassis > p.CaptionCont.SelectBox")))
+    wait.until(lambda d: option_name in caption_label.text)
+
+    caption_label.click()
+
+    fuel_dropdown = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".sumo_fuel .SelectBox")))
+    fuel_dropdown.click()
+    time.sleep(2)
+
+    option_name = "Dizel"
+
+    option_label = wait.until(EC.presence_of_element_located(
+        (By.XPATH,
+         f"//div[contains(@class,'sumo_fuel')]//ul[@class='options']//label[normalize-space(text())='{option_name}']")
+    ))
+
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", option_label)
+    time.sleep(1)
+
+    checkbox_span = option_label.find_element(By.XPATH, "./preceding-sibling::span")
+    driver.execute_script("arguments[0].click();", checkbox_span)
+    time.sleep(1)
+
+
+    caption_label = wait.until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, ".sumo_fuel > p.CaptionCont.SelectBox")))
+    wait.until(lambda d: option_name in caption_label.text)
+    caption_label.click()
+    time.sleep(1)
+
+    region_dropdown = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".sumo_region .SelectBox")))
+    region_dropdown.click()
+    time.sleep(2)
+
+
+    vojvodina_label = wait.until(EC.presence_of_element_located(
+        (By.XPATH,
+         "//div[contains(@class,'sumo_region')]//ul[@class='options']//label[normalize-space(text())='Vojvodina']")
+    ))
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", vojvodina_label)
+    time.sleep(2)
+
+
+    checkbox_span = vojvodina_label.find_element(By.XPATH, "./preceding-sibling::span")
+    driver.execute_script("arguments[0].click();", checkbox_span)
+    time.sleep(2)
+
+
+    caption_label = wait.until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, ".sumo_region > p.CaptionCont.SelectBox")))
+    wait.until(lambda d: "Vojvodina" in caption_label.text)
+    caption_label.click()
+    time.sleep(2)
+
+
+    driver.find_element(By.CSS_SELECTOR, ".sumo_showOldNew .SelectBox").click()
+    time.sleep(2)
+    driver.find_element(By.XPATH,
+                        "//div[contains(@class,'sumo_showOldNew')]//li[label[text()='Samo polovna vozila']]").click()
+    time.sleep(2)
+
+    driver.find_element(By.XPATH, "//button[contains(text(), 'PRETRAGA')]").click()
+
+    arteon_title=driver.find_element(By.TAG_NAME,"h1").text
+    assert "Volkswagen Arteon od 2017 do 2024 - Cena do 30000€" in arteon_title,"Error"
+
+
+def test_polovni_automobili_click_popular_models(driver):
+    wait = WebDriverWait(driver, 30)
+
+    najtrazeniji_link = wait.until(EC.element_to_be_clickable(
+        (By.XPATH, "//section//h3/a[text()='Najtraženiji modeli']")
+    ))
+
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", najtrazeniji_link)
+    time.sleep(0.3)
+
+    najtrazeniji_link.click()
+
+    popular_models_title=wait.until(EC.visibility_of_element_located((By.TAG_NAME, "h1"))).text
+    assert "Najtraženiji modeli automobila" in popular_models_title, "Error"
+
+
+def test_polovni_automobili_search_harley_davidson_sportster_(driver):
+    wait = WebDriverWait(driver, 50)
+
+    motori_link = wait.until(
+        EC.visibility_of_element_located((By.XPATH, '//a[@href="/motori" and contains(@class, "table-cell")]')))
+
+
+    actions = ActionChains(driver)
+
+    actions.move_to_element(motori_link).click().perform()
+    dropdown_trigger = wait.until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, "div.SumoSelect[name='brand'], div.SumoSelect"))
+    )
+    dropdown_trigger.click()
+    time.sleep(2)
+
+    search_input = driver.find_element(By.CSS_SELECTOR, ".SumoSelect.open input")
+    search_input.send_keys("Harley Davidson")
+    time.sleep(2)
+
+    harley_davidson_option = wait.until(EC.element_to_be_clickable((By.XPATH, "//label[contains(text(), 'Harley Davidson')]")))
+    harley_davidson_option.click()
+    time.sleep(3)
+
+#     II modeli
+
+    search_input = driver.find_element(By.ID, "modeltxt")
+    search_input.send_keys("Sportster")
+    time.sleep(2)
+
+#     III CENA DO
+    driver.find_element(By.ID, "price_to").send_keys("10000")
+    time.sleep(2)
+
+#     IV Godiste od
+    year_value_from = "2000"
+    year_label_from = f"{year_value_from} god."
+
+    year_dropdown = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".sumo_year_from .SelectBox")))
+    year_dropdown.click()
+    time.sleep(3)
+
+    option_label_from = wait.until(EC.presence_of_element_located(
+        (By.XPATH,
+         f"//div[contains(@class,'sumo_year_from')]//ul[@class='options']//label[normalize-space(text())='{year_label_from}']")
+    ))
+
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", option_label_from)
+    option_label_from.click()
+    time.sleep(2)
+
+#     V DO
+    year_value_to = "2024"
+    year_label_to = f"{year_value_to} god."
+
+    year_dropdown_to = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".sumo_year_to .SelectBox")))
+    year_dropdown_to.click()
+    time.sleep(3)
+
+    option_label_to = wait.until(EC.presence_of_element_located(
+        (By.XPATH,
+         f"//div[contains(@class,'sumo_year_to')]//ul[@class='options']//label[normalize-space(text())='{year_label_to}']")
+    ))
+
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", option_label_to)
+    option_label_to.click()
+    time.sleep(2)
+
+    caption_label_to = wait.until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, ".sumo_year_to > p.CaptionCont.SelectBox")))
+    wait.until(lambda d: year_value_to in caption_label_to.text)
+    time.sleep(2)
+
+
+#     VI tip
+
+    type_dropdown = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".sumo_type .SelectBox")))
+    type_dropdown.click()
+    time.sleep(3)
+
+    option_name="Chopper / Cruiser"
+
+    option_label = wait.until(EC.presence_of_element_located(
+        (By.XPATH,
+         f"//div[contains(@class,'sumo_type')]//ul[@class='options']//label[normalize-space(text())='{option_name}']")
+    ))
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", option_label)
+    time.sleep(2)
+
+    checkbox_span = option_label.find_element(By.XPATH, "./preceding-sibling::span")
+    driver.execute_script("arguments[0].click();", checkbox_span)
+    time.sleep(2)
+
+    caption_label = wait.until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, ".sumo_type > p.CaptionCont.SelectBox")))
+    wait.until(lambda d: option_name in caption_label.text)
+
+    caption_label.click()
+
+    time.sleep(2)
+
+    # VII REG
+    region_dropdown = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".sumo_region .SelectBox")))
+    region_dropdown.click()
+    time.sleep(2)
+
+    bgd_label = wait.until(EC.presence_of_element_located(
+        (By.XPATH,
+         "//div[contains(@class,'sumo_region')]//ul[@class='options']//label[normalize-space(text())='Beograd']")
+    ))
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", bgd_label)
+    time.sleep(2)
+
+    checkbox_span = bgd_label.find_element(By.XPATH, "./preceding-sibling::span")
+    driver.execute_script("arguments[0].click();", checkbox_span)
+    time.sleep(2)
+
+
+#     VII pol
+
+    driver.find_element(By.CSS_SELECTOR, ".sumo_showOldNew .SelectBox").click()
+    time.sleep(2)
+    driver.find_element(By.XPATH,
+                        "//div[contains(@class,'sumo_showOldNew')]//li[label[text()='Samo polovne motore']]").click()
+    time.sleep(2)
+
+    driver.find_element(By.XPATH, "//button[contains(text(), 'PRETRAGA')]").click()
+
+    harley_title=wait.until(EC.visibility_of_element_located((By.TAG_NAME,"h1"))).text
+    assert "Harley Davidson Sportster od 2000 do 2024 - Cena do 10000€" in harley_title,"Error"
+
+
+
+
+
+def test_polovni_automobili_logout(driver):
+    wait = WebDriverWait(driver, 30)
+    login(driver)
+
+    moj_profil = wait.until(EC.presence_of_element_located(
+        (By.CSS_SELECTOR, "a.js_ga-event.signin_menu_element[data-label='klik na moj profil']")
+    ))
+
+    # Napravi akciju hover (mouse over)
+    actions = ActionChains(driver)
+    actions.move_to_element(moj_profil).perform()
+
+    # Sačekaj da se pojavi link za odjavu
+    odjavi_se = wait.until(EC.element_to_be_clickable(
+        (By.CSS_SELECTOR, "a.js-logout-link.signin_menu_element[title='Odjavite se iz sistema']")
+    ))
+
+    # Klikni na "Odjavi se"
+    odjavi_se.click()
+
+
 
 
 
