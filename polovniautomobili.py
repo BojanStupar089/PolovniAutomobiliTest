@@ -73,7 +73,7 @@ def test_register_successful_on_polovni_automobili(driver):
 
     wait.until(EC.visibility_of_element_located((By.ID,"email")))
 
-    driver.find_element(By.ID,"email").send_keys("bojanstupar1989+test28@gmail.com")
+    driver.find_element(By.ID,"email").send_keys("bojanstupar1989+test29@gmail.com")
     driver.find_element(By.ID,"password_first").send_keys("Celarevo44!")
     driver.find_element(By.ID,"password_second").send_keys("Celarevo44!")
 
