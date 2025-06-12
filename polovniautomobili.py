@@ -11,7 +11,7 @@ import time
 
 @pytest.fixture()
 def driver():
-    ch_driver = webdriver.Chrome(service=Service('C:/Windows/chromedriver.exe'))
+    ch_driver = webdriver.Chrome(service=Service('C:/Windows/chromedriver-win64/chromedriver.exe'))
     ch_driver.maximize_window()
     ch_driver.get('https://polovniautomobili.com/')
     wait=WebDriverWait(ch_driver, 50)
@@ -45,7 +45,6 @@ def login(driver):
     driver.find_element(By.ID,"password_header").send_keys("Celarevo44!")
     driver.find_element(By.NAME,"login").click()
 
-
 def accept_cookies(driver):
 
     try:
@@ -61,7 +60,6 @@ def test_open_chrome_and_go_to_polovni_automobili(driver):
 
    assert "Automobili " in driver.find_element(By.TAG_NAME,"h1").text,"Error"
 
-
 def test_register_successful_on_polovni_automobili(driver):
     accept_cookies(driver)
     wait = WebDriverWait(driver, 30)
@@ -73,7 +71,7 @@ def test_register_successful_on_polovni_automobili(driver):
 
     wait.until(EC.visibility_of_element_located((By.ID,"email")))
 
-    driver.find_element(By.ID,"email").send_keys("bojanstupar1989+test29@gmail.com")
+    driver.find_element(By.ID,"email").send_keys("bojanstupar1989+test36@gmail.com")
     driver.find_element(By.ID,"password_first").send_keys("Celarevo44!")
     driver.find_element(By.ID,"password_second").send_keys("Celarevo44!")
 
@@ -85,7 +83,6 @@ def test_register_successful_on_polovni_automobili(driver):
 
     register_text=wait.until(EC.visibility_of_element_located((By.TAG_NAME,"p"))).text.strip()
     assert "Hvala na registraciji!" in register_text,"Error"
-
 
 def test_register_email_and_password_required_fields_validation(driver):
     accept_cookies(driver)
@@ -175,12 +172,6 @@ def test_register_email_already_exists(driver):
     ActionChains(driver).move_to_element(registruj_se).perform()
     wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, css_selector))).click()
 
-    # driver.execute_script("""
-    #     const errorDiv = document.getElementById('register_email_error');
-    #     if (errorDiv) {
-    #         errorDiv.style.display = 'none';
-    #     }
-    # """)
 
     wait.until(EC.visibility_of_element_located((By.ID, "email")))
 
@@ -203,8 +194,6 @@ def test_register_email_already_exists(driver):
 
     assert "Uneta E-mail adresa je već zauzeta" in error_text, "Expected error message not found"
 
-
-
 def test_register_tos_required(driver):
     accept_cookies(driver)
     wait = WebDriverWait(driver, 30)
@@ -219,17 +208,16 @@ def test_register_tos_required(driver):
     driver.find_element(By.ID, "email").send_keys("bojanstupar1989+test90@gmail.com")
     driver.find_element(By.ID, "password_first").send_keys("Celarevo44!")
     driver.find_element(By.ID, "password_second").send_keys("Celarevo44!")
-
+    time.sleep(2)
     driver.find_element(By.ID, "easySaleConsent").click()
     driver.find_element(By.ID, "easyBuyConsent").click()
-
+    time.sleep(2)
     driver.find_element(By.NAME, "login").click()
 
 
     is_invalid = driver.find_element(By.ID, "tos").get_attribute("validationMessage")
 
     assert "Please check this box if you want to proceed." in is_invalid, "Error"
-
 
 def test_login_succesfully(driver):
    accept_cookies(driver)
@@ -242,7 +230,6 @@ def test_login_succesfully(driver):
 
    email_text= email_element.text.strip()
    assert "MOJ PROFIL" in email_text,"Error"
-
 
 def test_login_email_invalid(driver):
 
@@ -273,7 +260,6 @@ def test_login_email_invalid(driver):
    # Extract and assert the text
    error_text = error_element.text.strip()
    assert "Ne postoji nalog sa ovom mail adresom." in error_text,"Error"
-
 
 def test_login_password_invalid(driver):
 
@@ -442,7 +428,7 @@ def test_polovni_automobili_click_button_post_ad(driver):
 
 def test_polovni_automobili_quick_search_and_click_latest_ads(driver):
     accept_cookies(driver)
-    wait = WebDriverWait(driver, 10)
+    wait = WebDriverWait(driver, 30)
     actions = ActionChains(driver)
 
 
@@ -489,7 +475,7 @@ def test_polovni_automobili_vehicle_offer_and_click_vehicle_transport(driver):
 
 def test_polovni_automobili_parts_and_accessories_click_electricity_and_electronics(driver):
     accept_cookies(driver)
-    wait = WebDriverWait(driver, 10)
+    wait = WebDriverWait(driver, 30)
     actions = ActionChains(driver)
 
     delovi_i_oprema = wait.until(EC.presence_of_element_located((By.XPATH, "//a[contains(text(), 'DELOVI I OPREMA')]")))
@@ -504,7 +490,7 @@ def test_polovni_automobili_parts_and_accessories_click_electricity_and_electron
 
 def test_polovni_automobili_parts_and_accessories_search_motorcycle_case(driver):
     accept_cookies(driver)
-    wait = WebDriverWait(driver, 10)
+    wait = WebDriverWait(driver, 30)
     actions = ActionChains(driver)
 
     delovi_i_oprema = wait.until(EC.presence_of_element_located((By.XPATH, "//a[contains(text(), 'DELOVI I OPREMA')]")))
@@ -522,10 +508,9 @@ def test_polovni_automobili_parts_and_accessories_search_motorcycle_case(driver)
 
     assert "Pretraga opreme za motore" in delovi_i_oprema_za_motore_title.text,"Error"
 
-
 def test_polovni_automobili_services_and_credits(driver):
     accept_cookies(driver)
-    wait = WebDriverWait(driver, 20)
+    wait = WebDriverWait(driver, 30)
     actions = ActionChains(driver)
 
     usluge_i_krediti = wait.until(EC.presence_of_element_located((By.XPATH, "//a[contains(text(), 'USLUGE I KREDITI')]")))
@@ -579,18 +564,21 @@ def test_polovni_automobili_click_discounted_vehicles_from_the_past_seven_days(d
 def test_polovni_automobili_click_sold_in_last_twenty_four_hours(driver):
 
     accept_cookies(driver)
-    driver.execute_script("window.scrollTo(0, 1000);")
-    wait = WebDriverWait(driver, 30)
+    driver.execute_script("window.scrollTo(0, 2400);")
+    wait = WebDriverWait(driver, 50)
 
-    twenty_four_hours = wait.until(EC.element_to_be_clickable(
+    twenty_four_hours = wait.until(EC.visibility_of_element_located(
         (By.XPATH,
-         "//h2[contains(text(), 'Prodato u poslednja 24h')]/ancestor::section")
+         "//a[contains(text(), 'Prodato u poslednja 24h')]")
     ))
-    time.sleep(2)
+
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", twenty_four_hours)
 
     ActionChains(driver).move_to_element(twenty_four_hours).perform()
     driver.execute_script("arguments[0].click();", twenty_four_hours)
+
+    wait.until(lambda driver: len(driver.window_handles) > 1)
+    driver.switch_to.window(driver.window_handles[-1])  #
 
     twenty_four_hours_title = wait.until(EC.visibility_of_element_located((By.TAG_NAME, "h1"))).text
     assert "Oglasi prodati u poslednja 24h" in twenty_four_hours_title,"Error"
@@ -602,7 +590,7 @@ def test_polovni_automobili_click_autotest_link(driver):
         (By.CSS_SELECTOR, 'a[href="/video-sadrzaj"]')
     ))
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", auto_testovi_link)
-    auto_testovi_link.click()
+    driver.execute_script("arguments[0].click();", auto_testovi_link)
 
     auto_testovi_title=driver.find_element(By.TAG_NAME,"h1").text
 
@@ -610,12 +598,12 @@ def test_polovni_automobili_click_autotest_link(driver):
 
 def test_polovni_automobili_click_car_buying_guide(driver):
     accept_cookies(driver)
-    wait = WebDriverWait(driver, 20)
+    wait = WebDriverWait(driver, 30)
     vodic_link = wait.until(EC.element_to_be_clickable(
         (By.CSS_SELECTOR, 'a.paBlueButtonTertiary[href="/pomoc-pri-kupovini-automobila"]')
     ))
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", vodic_link)
-    vodic_link.click()
+    driver.execute_script("arguments[0].click();", vodic_link)
 
     vodic_title=driver.find_element(By.TAG_NAME,"h1").text
     assert "Vodič za kupovinu automobila" in vodic_title,"Error"
@@ -797,7 +785,7 @@ def test_polovni_automobili_search_arteon(driver):
 
 def test_polovni_automobili_search_harley_davidson_sportster_(driver):
         accept_cookies(driver)
-        wait = WebDriverWait(driver, 30)
+        wait = WebDriverWait(driver, 50)
 
         motori_link = wait.until(
             EC.visibility_of_element_located((By.XPATH, '//a[@href="/motori" and contains(@class, "table-cell")]')))
@@ -925,7 +913,6 @@ def test_polovni_automobili_search_harley_davidson_sportster_(driver):
         harley_title = wait.until(EC.visibility_of_element_located((By.TAG_NAME, "h1"))).text
         assert "Harley Davidson Sportster od 2000 do 2024 - Cena do 10000€" in harley_title, "Error"
 
-
 def test_polovni_automobili_click_popular_models(driver):
     accept_cookies(driver)
     wait = WebDriverWait(driver, 30)
@@ -955,7 +942,6 @@ def test_polovni_automobili_click_about_us_link(driver):
 
     o_nama_text=driver.find_element(By.TAG_NAME,"h1").text
     assert "O sajtu Polovniautomobili.com" in o_nama_text,"Error"
-
 
 def test_polovni_automobili_click_mobile_applications_link(driver):
     accept_cookies(driver)
@@ -990,7 +976,6 @@ def test_polovni_automobili_click_poslovi_infostud_link(driver):
 
     infostud_title=wait.until(EC.visibility_of_element_located((By.TAG_NAME,"h1"))).text
     assert "Najveći izbor oglasa za posao na jednom mestu" in infostud_title, "Error"
-
 
 def test_polovni_automobili_logout(driver):
     accept_cookies(driver)
